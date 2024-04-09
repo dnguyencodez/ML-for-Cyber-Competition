@@ -33,12 +33,15 @@ class AttributeExtractor():
     
     # extract DLLs and corresponding API calls
     def extract_dlls_and_api_calls(self):
-        self.attributes["DLLs_and_APIs"] = {}
+        self.attributes["DLLs"] = []
+        self.attributes["APIs"] = []
 
         for imported_lib in self.pe.imports:
-            lib_name = imported_lib.name
-            api_functions = [entry.name for entry in imported_lib.entries if not entry.is_ordinal]
-            self.attributes["DLLs_and_APIs"][lib_name] = api_functions
+            lib_name = imported_lib.name.lower()
+            api_functions = [entry.name.lower() for entry in imported_lib.entries if not entry.is_ordinal]
+
+            self.attributes["DLLs"].append(lib_name)
+            self.attributes["APIs"].extend(api_functions)
 
     # extract PE header fields (file header, and optional header)
     def extract_header_fields(self):
@@ -129,7 +132,7 @@ class AttributeExtractor():
 
 # Testing attribute extractor
 if __name__ == '__main__':
-    pe_file_path = '../DikeDataset/files/malware/0a266ad12d079323f2170811f5195fb51893d5bcbc915e758dc10c0f876d5fb5.exe'
+    pe_file_path = '../../DikeDataset/files/malware/0a266ad12d079323f2170811f5195fb51893d5bcbc915e758dc10c0f876d5fb5.exe'
 
     with open(pe_file_path, "rb") as file:
         pe_bytes = file.read()
