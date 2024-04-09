@@ -56,18 +56,18 @@ class AttributeExtractor():
 
         # extracting PE file header fields
         file_header = self.pe.header
-        self.attributes["Machine"] = file_header.machine
+        self.attributes["Machine"] = file_header.machine.value
         self.attributes["NumberOfSections"] = file_header.numberof_sections
         self.attributes["TimeDateStamp"] = file_header.time_date_stamps
         self.attributes["PointerToSymbolTable"] = file_header.pointerto_symbol_table
         self.attributes["NumberOfSymbols"] = file_header.numberof_symbols
         self.attributes["SizeOfOptionalHeader"] = file_header.sizeof_optional_header
-        self.attributes["Characteristics"] = " ".join([str(c).replace("HEADER_CHARACTERISTICS.","") for c in file_header.characteristics_list])
+        self.attributes["Characteristics"] = file_header.characteristics.value
 
         # extract optional header fields
         optional_header = self.pe.optional_header
         self.attributes.update({
-            "Magic": optional_header.magic,
+            "Magic": optional_header.magic.value,
             "MajorLinkerVersion": optional_header.major_linker_version,
             "MinorLinkerVersion": optional_header.minor_linker_version,
             "SizeOfCode": optional_header.sizeof_code,
@@ -88,7 +88,7 @@ class AttributeExtractor():
             "SizeOfImage": optional_header.sizeof_image,
             "SizeOfHeaders": optional_header.sizeof_headers,
             "CheckSum": optional_header.checksum,
-            "Subsystem": optional_header.subsystem,
+            "Subsystem": optional_header.subsystem.value,
             "DllCharacteristics": " ".join([str(d).replace("DLL_CHARACTERISTICS.", "") for d in optional_header.dll_characteristics_lists]),
             "SizeOfStackReserve": optional_header.sizeof_stack_reserve,
             "SizeOfStackCommit": optional_header.sizeof_stack_commit,
@@ -139,9 +139,9 @@ if __name__ == '__main__':
 
     test_attribute_extractor = AttributeExtractor(pe_bytes)
 
-    test_attribute_extractor.extract_dlls_and_api_calls()
+    # test_attribute_extractor.extract_dlls_and_api_calls()
     test_attribute_extractor.extract_header_fields()
-    test_attribute_extractor.extract_sections_fields()
+    # test_attribute_extractor.extract_sections_fields()
     # imphash = test_attribute_extractor.get_imphash()
 
     pprint.pprint(test_attribute_extractor.attributes)
