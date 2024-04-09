@@ -120,11 +120,11 @@ class AttributeExtractor():
                 "PointerToLineNumbers": currSection.pointerto_line_numbers,
                 "NumberOfRelocations": currSection.numberof_relocations,
                 "NumberofLineNumbers": currSection.numberof_line_numbers,
-                "Characteristics": " ".join([str(c).replace("SECTION_CHARACTERISTICS.", "") for c in currSection.characteristics_lists]),
+                "Characteristics": currSection.characteristics,
                 
                 # the following help detect obfuscation and packing
-                "Hashes": hashlib.md5(currSection.content).hexdigest(),
-                "Entropy": currSection.entropy
+                # "Hashes": hashlib.md5(currSection.content).hexdigest(),
+                # "Entropy": currSection.entropy
             }
 
 
@@ -140,8 +140,8 @@ if __name__ == '__main__':
     test_attribute_extractor = AttributeExtractor(pe_bytes)
 
     # test_attribute_extractor.extract_dlls_and_api_calls()
-    test_attribute_extractor.extract_header_fields()
-    # test_attribute_extractor.extract_sections_fields()
+    # test_attribute_extractor.extract_header_fields()
+    test_attribute_extractor.extract_sections_fields()
     # imphash = test_attribute_extractor.get_imphash()
 
     pprint.pprint(test_attribute_extractor.attributes)
