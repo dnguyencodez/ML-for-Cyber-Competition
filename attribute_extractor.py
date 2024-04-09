@@ -1,6 +1,12 @@
 import re
 import lief
 import math
+import hashlib
+
+"""
+NOTES:
+- maybe add rich header raw data later on (describes program build location)
+"""
 
 class AttributeExtractor():
     def __init__(self, pe_bytes) -> None:
@@ -8,6 +14,10 @@ class AttributeExtractor():
         # use below when processing HTTP requests
         self.pe = lief.PE.parse(list(pe_bytes))
         self.attributes = {}
+
+    # compute import hash (imphash) to identify similar malware
+    # def get_imphash(self):
+    #     return self.pe.get_imphash()
 
     # extract entropy
     def extract_entropy(self):
@@ -25,8 +35,9 @@ class AttributeExtractor():
         self.attributes["dlls_apis"] = {}
 
         for imported_lib in self.pe.imports:
+            lib_name = imported_lib.name
             api_functions = [entry.name for entry in imported_lib.entries if not entry.is_ordinal]
-            self.attributes["dlls_apis"][imported_lib] = api_functions
+            self.attributes["dlls_apis"][lib_name] = api_functions
 
     # extract PE header fields (file header, and optional header)
     def extract_header_fields(self):
@@ -105,27 +116,32 @@ class AttributeExtractor():
                 "PointerToLineNumbers": currSection.pointerto_line_numbers,
                 "NumberOfRelocations": currSection.numberof_relocations,
                 "NumberofLineNumbers": currSection.numberof_line_numbers,
-                "Characteristics": " ".join([str(c).replace("SECTION_CHARACTERISTICS.", "") for c in currSection.characteristics_lists])
+                "Characteristics": " ".join([str(c).replace("SECTION_CHARACTERISTICS.", "") for c in currSection.characteristics_lists]),
+                
+                # the following help detect obfuscation and packing
+                "Hashes": hashlib.md5(currSection.content).hexdigest(),
+                "Entropy": currSection.entropy
             }
 
 
 
 
 # Testing attribute extractor
-# if __name__ == '__main__':
-#     pe_file_path = '../DikeDataset/files/malware/00a0d8c3adc67e930fd89331e4e41cfe2a7128072d5d3ca0ec369da5b7847a45.exe'
+if __name__ == '__main__':
+    pe_file_path = '../DikeDataset/files/malware/00a0d8c3adc67e930fd89331e4e41cfe2a7128072d5d3ca0ec369da5b7847a45.exe'
 
-#     with open(pe_file_path, "rb") as file:
-#         pe_bytes = file.read()
+    with open(pe_file_path, "rb") as file:
+        pe_bytes = file.read()
 
-#     test_attribute_extractor = AttributeExtractor(pe_bytes)
+    test_attribute_extractor = AttributeExtractor(pe_bytes)
 
-#     test_attribute_extractor.extract_dlls_and_api_calls()
-#     test_attribute_extractor.extract_header_fields()
-#     test_attribute_extractor.extract_sections_fields()
+    test_attribute_extractor.extract_dlls_and_api_calls()
+    test_attribute_extractor.extract_header_fields()
+    test_attribute_extractor.extract_sections_fields()
+    imphash = test_attribute_extractor.get_imphash()
 
-#     # print(test_attribute_extractor.attributes)
+    # print(test_attribute_extractor.attributes)
 
-#     # print(test_attribute_extractor.pe.has_imports)
-#     # print(dll_list)
+    # print(test_attribute_extractor.pe.has_imports)
+    # print(dll_list)
 
