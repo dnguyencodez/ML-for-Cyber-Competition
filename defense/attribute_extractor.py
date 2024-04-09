@@ -131,21 +131,21 @@ class AttributeExtractor():
 
 
 # Testing attribute extractor
-if __name__ == '__main__':
-    pe_file_path = '../../DikeDataset/files/malware/0a266ad12d079323f2170811f5195fb51893d5bcbc915e758dc10c0f876d5fb5.exe'
+# if __name__ == '__main__':
+#     pe_file_path = '../../DikeDataset/files/malware/0a266ad12d079323f2170811f5195fb51893d5bcbc915e758dc10c0f876d5fb5.exe'
 
-    with open(pe_file_path, "rb") as file:
-        pe_bytes = file.read()
+#     with open(pe_file_path, "rb") as file:
+#         pe_bytes = file.read()
 
-    test_attribute_extractor = AttributeExtractor(pe_bytes)
+#     test_attribute_extractor = AttributeExtractor(pe_bytes)
 
-    # test_attribute_extractor.extract_dlls_and_api_calls()
-    # test_attribute_extractor.extract_header_fields()
-    test_attribute_extractor.extract_sections_fields()
-    # imphash = test_attribute_extractor.get_imphash()
+#     # test_attribute_extractor.extract_dlls_and_api_calls()
+#     # test_attribute_extractor.extract_header_fields()
+#     test_attribute_extractor.extract_sections_fields()
+#     # imphash = test_attribute_extractor.get_imphash()
 
-    pprint.pprint(test_attribute_extractor.attributes)
+#     pprint.pprint(test_attribute_extractor.attributes)
 
-    # print(test_attribute_extractor.pe.has_imports)
-    # print(dll_list)
+#     # print(test_attribute_extractor.pe.has_imports)
+#     # print(dll_list)
 

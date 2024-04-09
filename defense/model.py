@@ -2,6 +2,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_selection import mutual_info_classif, SelectKBest
 from sklearn.decomposition import PCA
+import json
 
 class malware_detection_model():
 
