@@ -6,7 +6,7 @@ import pprint
 
 """
 NOTES:
-- maybe add rich header raw data later on (describes program build location)
+- maybe add rich header raw data later on (describes program's compile location)
 """
 
 class AttributeExtractor():
