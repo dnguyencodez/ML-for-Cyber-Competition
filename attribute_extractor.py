@@ -84,26 +84,48 @@ class AttributeExtractor():
         })
 
 
-        # extract PE sections fields
-        def extract_sections_fields(self):
-            sections = []
+    # extract PE sections fields
+    def extract_sections_fields(self):
+        self.attributes["sections"] = {}
+        sections = ['.text', '.data', '.rdata', '.bss', '.idata', '.edata', '.rsrc', '.reloc', '.tls']
+
+        for s in sections:
+            currSection = self.pe.get_section(s)
+
+            if not currSection:
+                continue
+            
+            self.attributes["sections"][s] = {
+                # "Name": currSection.name,
+                "Misc_VirtualSize": currSection.virtual_size,
+                "VirtualAddress": currSection.virtual_address,
+                "SizeOfRawData": currSection.size,
+                "PointerToRawData": currSection.pointerto_raw_data,
+                "PointerToRelocations": currSection.pointerto_relocation,
+                "PointerToLineNumbers": currSection.pointerto_line_numbers,
+                "NumberOfRelocations": currSection.numberof_relocations,
+                "NumberofLineNumbers": currSection.numberof_line_numbers,
+                "Characteristics": " ".join([str(c).replace("SECTION_CHARACTERISTICS.", "") for c in currSection.characteristics_lists])
+            }
+
 
 
 
 # Testing attribute extractor
-if __name__ == '__main__':
-    pe_file_path = '../DikeDataset/files/malware/00a0d8c3adc67e930fd89331e4e41cfe2a7128072d5d3ca0ec369da5b7847a45.exe'
+# if __name__ == '__main__':
+#     pe_file_path = '../DikeDataset/files/malware/00a0d8c3adc67e930fd89331e4e41cfe2a7128072d5d3ca0ec369da5b7847a45.exe'
 
-    with open(pe_file_path, "rb") as file:
-        pe_bytes = file.read()
+#     with open(pe_file_path, "rb") as file:
+#         pe_bytes = file.read()
 
-    test_attribute_extractor = AttributeExtractor(pe_bytes)
+#     test_attribute_extractor = AttributeExtractor(pe_bytes)
 
-    test_attribute_extractor.extract_dlls_and_api_calls()
-    test_attribute_extractor.extract_header_fields()
+#     test_attribute_extractor.extract_dlls_and_api_calls()
+#     test_attribute_extractor.extract_header_fields()
+#     test_attribute_extractor.extract_sections_fields()
 
-    print(test_attribute_extractor.attributes)
+#     # print(test_attribute_extractor.attributes)
 
-    print(test_attribute_extractor.pe.has_imports)
-    # print(dll_list)
+#     # print(test_attribute_extractor.pe.has_imports)
+#     # print(dll_list)
 
