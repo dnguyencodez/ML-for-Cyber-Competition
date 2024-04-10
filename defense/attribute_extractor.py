@@ -14,7 +14,11 @@ class AttributeExtractor():
         self.pe_bytes = pe_bytes
         # use below when processing HTTP requests
         self.pe = lief.PE.parse(list(pe_bytes))
-        self.attributes = {}
+
+        self.dll_attributes = []
+        self.api_attributes = []
+        self.header_attributes = {}
+        self.section_attributes = {}
 
     # compute import hash (imphash) to identify similar malware
     # def get_imphash(self):
@@ -33,40 +37,37 @@ class AttributeExtractor():
     
     # extract DLLs and corresponding API calls
     def extract_dlls_and_api_calls(self):
-        self.attributes["DLLs"] = []
-        self.attributes["APIs"] = []
-
         for imported_lib in self.pe.imports:
             lib_name = imported_lib.name.lower()
             api_functions = [entry.name.lower() for entry in imported_lib.entries if not entry.is_ordinal]
 
-            self.attributes["DLLs"].append(lib_name)
-            self.attributes["APIs"].extend(api_functions)
+            self.dll_attributes.append(lib_name)
+            self.api_attributes.extend(api_functions)
 
     # extract PE header fields (file header, and optional header)
     def extract_header_fields(self):
 
         # extract DOS header fields
         dos_header = self.pe.dos_header
-        self.attributes["e_magic"] = dos_header.magic
-        self.attributes["Checksum_DOS"] = dos_header.checksum
-        self.attributes["oem_id"] = dos_header.oem_id
-        self.attributes["oem_info"] = dos_header.oem_info
+        self.header_attributes["e_magic"] = dos_header.magic
+        self.header_attributes["Checksum_DOS"] = dos_header.checksum
+        self.header_attributes["oem_id"] = dos_header.oem_id
+        self.header_attributes["oem_info"] = dos_header.oem_info
         # look more into dos header later
 
         # extracting PE file header fields
         file_header = self.pe.header
-        self.attributes["Machine"] = file_header.machine.value
-        self.attributes["NumberOfSections"] = file_header.numberof_sections
-        self.attributes["TimeDateStamp"] = file_header.time_date_stamps
-        self.attributes["PointerToSymbolTable"] = file_header.pointerto_symbol_table
-        self.attributes["NumberOfSymbols"] = file_header.numberof_symbols
-        self.attributes["SizeOfOptionalHeader"] = file_header.sizeof_optional_header
-        self.attributes["Characteristics"] = file_header.characteristics.value
+        self.header_attributes["Machine"] = file_header.machine.value
+        self.header_attributes["NumberOfSections"] = file_header.numberof_sections
+        self.header_attributes["TimeDateStamp"] = file_header.time_date_stamps
+        self.header_attributes["PointerToSymbolTable"] = file_header.pointerto_symbol_table
+        self.header_attributes["NumberOfSymbols"] = file_header.numberof_symbols
+        self.header_attributes["SizeOfOptionalHeader"] = file_header.sizeof_optional_header
+        self.header_attributes["Characteristics"] = file_header.characteristics.value
 
         # extract optional header fields
         optional_header = self.pe.optional_header
-        self.attributes.update({
+        self.header_attributes.update({
             "Magic": optional_header.magic.value,
             "MajorLinkerVersion": optional_header.major_linker_version,
             "MinorLinkerVersion": optional_header.minor_linker_version,
@@ -101,7 +102,6 @@ class AttributeExtractor():
 
     # extract PE sections fields
     def extract_sections_fields(self):
-        self.attributes["Sections"] = {}
         sections = ['.text', '.data', '.rdata', '.bss', '.idata', '.edata', '.rsrc', '.reloc', '.tls']
 
         for s in sections:
@@ -110,7 +110,7 @@ class AttributeExtractor():
             if not currSection:
                 continue
             
-            self.attributes["Sections"][s] = {
+            self.section_attributes["Sections"][s] = {
                 # "Name": currSection.name,
                 "Misc_VirtualSize": currSection.virtual_size,
                 "VirtualAddress": currSection.virtual_address,

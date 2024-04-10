@@ -22,8 +22,8 @@ def create_feature_list(file_list):
 
         att_extractor.extract_dlls_and_api_calls()
 
-        DLL_LIST.extend(att_extractor.attributes["DLLs"])
-        API_LIST.extend(att_extractor.attributes["APIs"]) 
+        DLL_LIST.extend(att_extractor.dll_attributes)
+        API_LIST.extend(att_extractor.api_attributes) 
 
 
 if __name__=='__main__':
