@@ -1,4 +1,4 @@
-## How to Query
+## How to Query the Model
 
 ---
 ### Navigate to the 'defense' directory
