@@ -12,6 +12,6 @@ class malware_detection_model():
                  ) -> None:
         
         self.classifier = classifier
-        self.textual_extractor = CountVectorizer() if textual_extractor==1 else self.textual_extractor=TfidfVectorizer(ngram_range=(2,2))
+        self.textual_extractor = CountVectorizer() if textual_extractor==1 else TfidfVectorizer(ngram_range=(2,2))
         
                      
