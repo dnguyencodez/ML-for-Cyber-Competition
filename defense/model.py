@@ -5,26 +5,7 @@ from sklearn.decomposition import PCA
 import json
 import os
 
-data_directory = 'train_and_test_data'  # Replace with the name of your folder
 
-# Lists to store the content of the JSON files
-train_data = []
-test_data = []
-
-# Loop through the files in the directory
-for filename in os.listdir(data_directory):
-    if filename.endswith('.json'):  # Check if the file is a JSON file
-        file_path = os.path.join(data_directory, filename)
-        
-        # Open and read the content of the JSON file
-        with open(file_path, 'r') as file:
-            data = json.load(file)
-            
-            # Check if the filename indicates that the data is for training or testing
-            if 'train' in filename:
-                train_data.append(data)
-            elif 'test' in filename:
-                test_data.append(data)
 
 class malware_detection_model():
 
