@@ -1,8 +1,5 @@
-import re
 import lief
-import math
-import hashlib
-import pprint
+import numpy as np
 
 """
 NOTES:
@@ -25,15 +22,15 @@ class AttributeExtractor():
     #     return self.pe.get_imphash()
 
     # extract entropy
-    def extract_entropy(self):
-        if not self.pe_bytes:
-            return 0
-        entropy=0
-        for x in range(256):
-            p_x = float(self.pe_bytes.count(bytes(x)))/len(self.pe_bytes)
-            if p_x>0:
-                entropy += - p_x*math.log(p_x, 2)
-        return entropy
+    # def extract_entropy(self):
+    #     if not self.pe_bytes:
+    #         return 0
+    #     entropy=0
+    #     for x in range(256):
+    #         p_x = float(self.pe_bytes.count(bytes(x)))/len(self.pe_bytes)
+    #         if p_x>0:
+    #             entropy += - p_x*math.log(p_x, 2)
+    #     return entropy
     
     # extract DLLs and corresponding API calls
     def extract_dlls_and_api_calls(self):
@@ -63,7 +60,7 @@ class AttributeExtractor():
         self.header_attributes["PointerToSymbolTable"] = file_header.pointerto_symbol_table
         self.header_attributes["NumberOfSymbols"] = file_header.numberof_symbols
         self.header_attributes["SizeOfOptionalHeader"] = file_header.sizeof_optional_header
-        self.header_attributes["Characteristics"] = file_header.characteristics.value
+        self.header_attributes["Characteristics"] = file_header.characteristics
 
         # extract optional header fields
         optional_header = self.pe.optional_header
@@ -90,7 +87,7 @@ class AttributeExtractor():
             "SizeOfHeaders": optional_header.sizeof_headers,
             "CheckSum": optional_header.checksum,
             "Subsystem": optional_header.subsystem.value,
-            "DllCharacteristics": " ".join([str(d).replace("DLL_CHARACTERISTICS.", "") for d in optional_header.dll_characteristics_lists]),
+            "DllCharacteristics": optional_header.dll_characteristics,
             "SizeOfStackReserve": optional_header.sizeof_stack_reserve,
             "SizeOfStackCommit": optional_header.sizeof_stack_commit,
             "SizeOfHeapReserve": optional_header.sizeof_heap_reserve,
@@ -102,7 +99,26 @@ class AttributeExtractor():
 
     # extract PE sections fields
     def extract_sections_fields(self):
+        default_section_structure =  {
+                # "Name": currSection.name,
+                "Misc_VirtualSize": 0,
+                "VirtualAddress": 0,
+                "SizeOfRawData": 0,
+                "PointerToRawData": 0,
+                "PointerToRelocations": 0,
+                "PointerToLineNumbers": 0,
+                "NumberOfRelocations": 0,
+                "NumberofLineNumbers": 0,
+                "Characteristics": 0,
+                
+                # the following help detect obfuscation and packing
+                # "Hashes": hashlib.md5(currSection.content).hexdigest(),
+                # "Entropy": currSection.entropy
+            }
+
         sections = ['.text', '.data', '.rdata', '.bss', '.idata', '.edata', '.rsrc', '.reloc', '.tls']
+
+        self.section_attributes = {s: default_section_structure.copy() for s in sections}
 
         for s in sections:
             currSection = self.pe.get_section(s)
@@ -110,7 +126,7 @@ class AttributeExtractor():
             if not currSection:
                 continue
             
-            self.section_attributes["Sections"][s] = {
+            self.section_attributes[s] = {
                 # "Name": currSection.name,
                 "Misc_VirtualSize": currSection.virtual_size,
                 "VirtualAddress": currSection.virtual_address,
@@ -127,8 +143,25 @@ class AttributeExtractor():
                 # "Entropy": currSection.entropy
             }
 
+    def extract_and_preprocess(self):
 
+        if not self.pe:
+            return None, None
+        
+        self.extract_header_fields()
+        self.extract_sections_fields()
+        self.extract_dlls_and_api_calls()
 
+        # concatenating names within the list to form a single string
+        ifs1_atts = [' '.join(self.dll_attributes + self.api_attributes)]
+        
+        header_values = list(self.header_attributes.values())
+        section_values = [value for section in self.section_attributes.values() for value in section.values()]
+
+        # convert to numpy array directly
+        ifs2_atts = np.array(header_values + section_values).reshape(1,-1)
+
+        return ifs1_atts, ifs2_atts
 
 # Testing attribute extractor
 # if __name__ == '__main__':
@@ -140,11 +173,12 @@ class AttributeExtractor():
 #     test_attribute_extractor = AttributeExtractor(pe_bytes)
 
 #     # test_attribute_extractor.extract_dlls_and_api_calls()
-#     # test_attribute_extractor.extract_header_fields()
-#     test_attribute_extractor.extract_sections_fields()
+#     test_attribute_extractor.extract_header_fields()
+#     # test_attribute_extractor.extract_sections_fields()
 #     # imphash = test_attribute_extractor.get_imphash()
 
-#     pprint.pprint(test_attribute_extractor.attributes)
+#     pprint.pprint(test_attribute_extractor.header_attributes)
+#     # pprint.pprint(test_attribute_extractor.section_attributes)
 
 #     # print(test_attribute_extractor.pe.has_imports)
 #     # print(dll_list)
