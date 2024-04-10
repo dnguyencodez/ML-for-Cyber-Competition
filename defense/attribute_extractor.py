@@ -63,7 +63,7 @@ class AttributeExtractor():
         self.header_attributes["PointerToSymbolTable"] = file_header.pointerto_symbol_table
         self.header_attributes["NumberOfSymbols"] = file_header.numberof_symbols
         self.header_attributes["SizeOfOptionalHeader"] = file_header.sizeof_optional_header
-        self.header_attributes["Characteristics"] = file_header.characteristics.value
+        self.header_attributes["Characteristics"] = file_header.characteristics
 
         # extract optional header fields
         optional_header = self.pe.optional_header
@@ -102,7 +102,26 @@ class AttributeExtractor():
 
     # extract PE sections fields
     def extract_sections_fields(self):
+        default_section_structure =  {
+                # "Name": currSection.name,
+                "Misc_VirtualSize": 0,
+                "VirtualAddress": 0,
+                "SizeOfRawData": 0,
+                "PointerToRawData": 0,
+                "PointerToRelocations": 0,
+                "PointerToLineNumbers": 0,
+                "NumberOfRelocations": 0,
+                "NumberofLineNumbers": 0,
+                "Characteristics": 0,
+                
+                # the following help detect obfuscation and packing
+                # "Hashes": hashlib.md5(currSection.content).hexdigest(),
+                # "Entropy": currSection.entropy
+            }
+
         sections = ['.text', '.data', '.rdata', '.bss', '.idata', '.edata', '.rsrc', '.reloc', '.tls']
+
+        self.section_attributes = {s: default_section_structure.copy() for s in sections}
 
         for s in sections:
             currSection = self.pe.get_section(s)
@@ -110,7 +129,7 @@ class AttributeExtractor():
             if not currSection:
                 continue
             
-            self.section_attributes["Sections"][s] = {
+            self.section_attributes[s] = {
                 # "Name": currSection.name,
                 "Misc_VirtualSize": currSection.virtual_size,
                 "VirtualAddress": currSection.virtual_address,
