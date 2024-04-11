@@ -1,6 +1,11 @@
 ## How to Query the Model
 
 ---
+### Clone the repository
+```
+git clone "HTTPS URL"
+```
+
 ### Navigate to the 'defense' directory
 ```
 cd defense
