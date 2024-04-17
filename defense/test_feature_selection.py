@@ -1,6 +1,9 @@
 import os
 import lief
+from attribute_extractor import AttributeExtractor
+import pandas as pd
 
+features_list_f = []
 def extract_features(file_path):
     pe = lief.parse(file_path)
     features = dict()
@@ -41,15 +44,31 @@ def extract_features(file_path):
 
     return features
 
+def get_all_keys(dict_obj, parent_key=''):
+    keys = []
+    for k, v in dict_obj.items():
+        new_key = f"{parent_key}.{k}" if parent_key else k
+        keys.append(new_key)
+        if isinstance(v, dict):
+            keys.extend(get_all_keys(v, new_key))
+    return keys
+
+
 def process_directory(directory_path):
     features_list = []
     for file_name in os.listdir(directory_path):
         # if file_name.endswith(".pe"):
-            file_path = os.path.join(directory_path, file_name)
-            features = extract_features(file_path)
-            features_list.append(features)
-    print(features_list)
-    return features_list
+        file_path = os.path.join(directory_path, file_name)
+        features = extract_features(file_path)
+        features_list.append(features)
+    all_keys = set()
+    for features in features_list:
+        all_keys.update(get_all_keys(features))
+        
+    print(f"All unique keys: {list(all_keys)}")
+    
+    features_list_f = features_list
+    # return features_list
 
 # Use the function
-features = process_directory("D:\Yash-docs\Assignments-TAMU\ML\ML_model\ML-for-Cyber-Competition\defense\datasets\gw1")
+features = process_directory("D:\Yash-docs\Assignments-TAMU\ML\ML_model\ML-for-Cyber-Competition\defense\datasets\mw1")

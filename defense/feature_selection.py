@@ -94,7 +94,7 @@ def process_directory(directory_path):
             file_path = os.path.join(directory_path, file_name)
             features = extract_features(file_path)
             features_list.append(features)
-    return features_list
+    # return features_list
 
 # Use the function
 features = process_directory("D:\Yash-docs\Assignments-TAMU\ML\ML_model\ML-for-Cyber-Competition\defense\datasets\mw2")
