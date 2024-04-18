@@ -10,11 +10,11 @@ New train test splitting with the provided test datasets
 - Train data: all of the previous training data we used + the previous test data
 - Test data: the provided dataset from the prof
 """
-def create_train_set(benign_dir, mal_dir):
-    benign_paths = [os.path.join(benign_dir, item) for item in os.listdir(benign_dir)]
-    b_labels = [0] * len(benign_paths)
-    mal_paths = [os.path.join(mal_dir, item) for item in os.listdir(mal_dir)]
-    m_labels = [1] * len(mal_paths)
+def create_train_set(benign_train, mal_train):
+    benign_paths = benign_train['datapoints']
+    b_labels = benign_train['labels']
+    mal_paths = mal_train['datapoints']
+    m_labels = mal_train['labels']
 
     combined_datapoints = benign_paths + mal_paths
     combined_labels = b_labels + m_labels
@@ -62,21 +62,24 @@ def create_test_sets(curr_dir):
 
 
 if __name__=='__main__':
-    benign_dir = '../../DikeDataset/files/benign'
-    malware_dir = '../../DikeDataset/files/malware'
+    with open('train_and_test_data/final_benign.json') as f:
+        benign_train_set = json.load(f)
+        
+    with open('train_and_test_data/final_malignant.json') as f:
+        mal_train_set = json.load(f)
 
-    train_dataponts, train_labels = create_train_set(benign_dir, malware_dir)
-    with open('train_data.json', 'w') as f:
+    train_dataponts, train_labels = create_train_set(benign_train_set, mal_train_set)
+    with open('train_data_balanced.json', 'w') as f:
         json.dump({'datapoints': train_dataponts, 'labels': train_labels}, f)
 
-    test_dir = '../../TestDataset'
-    for dir in os.listdir(test_dir):
-        if dir == '.DS_Store':
-            continue
-        curr_dir = os.path.join(test_dir, dir)
-        curr_test_dict, dir_name = create_test_sets(curr_dir)
-        with open(dir_name + '.json', 'w') as f:
-            json.dump(curr_test_dict, f)
+    # test_dir = '../../TestDataset'
+    # for dir in os.listdir(test_dir):
+    #     if '.DS' in dir:
+    #         continue
+    #     curr_dir = os.path.join(test_dir, dir)
+    #     curr_test_dict, dir_name = create_test_sets(curr_dir)
+    #     with open(dir_name + '.json', 'w') as f:
+    #         json.dump(curr_test_dict, f)
 
     # benign_train, benign_test = split_dataset(benign_dir, 0)
     # mal_train, mal_test = split_dataset(malware_dir)
