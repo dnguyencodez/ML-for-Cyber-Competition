@@ -48,11 +48,11 @@ def get_all_keys(dict_obj, parent_key=''):
     keys = []
     for k, v in dict_obj.items():
         new_key = f"{parent_key}.{k}" if parent_key else k
-        keys.append(new_key)
+        if v != 'Not available':
+            keys.append(new_key)
         if isinstance(v, dict):
             keys.extend(get_all_keys(v, new_key))
     return keys
-
 
 def process_directory(directory_path):
     features_list = []
@@ -66,6 +66,7 @@ def process_directory(directory_path):
         all_keys.update(get_all_keys(features))
         
     print(f"All unique keys: {list(all_keys)}")
+    print(f"All unique keys length: {len(all_keys)}")
     
     features_list_f = features_list
     # return features_list
