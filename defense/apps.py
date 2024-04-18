@@ -48,7 +48,7 @@ def create_app(model, threshold):
 
 if __name__ == '__main__':
     # load the model
-    model = load('malware_detection_model.joblib')
+    model = load('malware_detection_model_updated.joblib')
     threshold = 0.75
 
     # Create app with the loaded model and threshold
