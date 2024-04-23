@@ -110,6 +110,7 @@ class AttributeExtractor():
                 "NumberOfRelocations": 0,
                 "NumberofLineNumbers": 0,
                 "Characteristics": 0,
+                "Entropy": 0
                 
                 # the following help detect obfuscation and packing
                 # "Hashes": hashlib.md5(currSection.content).hexdigest(),
@@ -140,7 +141,7 @@ class AttributeExtractor():
                 
                 # the following help detect obfuscation and packing
                 # "Hashes": hashlib.md5(currSection.content).hexdigest(),
-                # "Entropy": currSection.entropy
+                "Entropy": currSection.entropy
             }
 
     def extract_and_preprocess(self):

@@ -15,11 +15,12 @@ class MalwareDetectionModel():
                     classifier=RandomForestClassifier(),
                     numerical_extractor = StandardScaler(),
                     selector = SelectKBest(score_func=mutual_info_classif, k='all'),
+                    textual_extractor=1,
                     pca = PCA(n_components=0.95)
                 ) -> None:
         
         self.classifier = classifier
-        self.textual_extractor = CountVectorizer(vocabulary=vocabulary['ifs1'], binary=True) # if textual_extractor==1 else TfidfVectorizer(ngram_range=(2,2))
+        self.textual_extractor = CountVectorizer(vocabulary=vocabulary, binary=True) if textual_extractor==1 else TfidfVectorizer(vocabulary=vocabulary,ngram_range=(1,2))
         self.numerical_extractor = numerical_extractor
         self.pca = pca
         self.selector = selector
@@ -74,7 +75,7 @@ class MalwareDetectionModel():
 
         # apply IG
         selected_features = self.selector.transform(reduced_features)
-
+        
         return selected_features
     
     
@@ -131,12 +132,5 @@ class MalwareDetectionModel():
 
     # predict with probability and threshold
     def predict_threshold(self, test_text_atts, test_num_atts, threshold=0.75):
-        transformed_feats = self.extract_features_test_data(test_text_atts, test_num_atts)
-
-        prob = self.classifier.predict_proba(transformed_feats)
-
-        pred = []
-        for p in prob:
-            pred.append(int(p[0] < threshold))
-
-        return pred
+        probs = self.predict_proba(test_text_atts, test_num_atts)[:, 1]  # Probabilities for the positive class
+        return (probs >= threshold).astype(int)
