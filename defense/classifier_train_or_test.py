@@ -298,4 +298,4 @@ if __name__=='__main__':
 
 
     if not train_model and not test_model:
-        print("No training or testing done, please pass the proper argument.")
+        print("No training or testing eone, please pass the proper argument.")
