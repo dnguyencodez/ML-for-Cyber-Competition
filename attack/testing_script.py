@@ -2,7 +2,7 @@ import os
 import requests
 import pandas as pd
 
-folder_path = 'D:/Yash-docs/Assignments-TAMU/ML/ML_model/ML-for-Cyber-Competition/attack/code-caves-generated_1'  # Replace with your folder path
+folder_path = 'D:/Yash-docs/Assignments-TAMU/ML/ML_model/ML-for-Cyber-Competition/attack/dropper_samples_set1_and_set3'  # Replace with your folder path
 
 # Function to send requests
 def send_request(file_path):

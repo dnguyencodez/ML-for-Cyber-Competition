@@ -46,7 +46,7 @@ def process_directory(input_dir, output_dir):
             file_counter += 1
 
 # Example usage:
-input_directory = "D:/Dropper/Dropper/Dropper/Set-1"  # Replace with your directory path
+input_directory = "D:/Dropper/Dropper/Dropper/Set-3"  # Replace with your directory path
 output_directory = "D:/Dropper/Dropper/Dropper/new_binaries"  # Output directory path
 
 process_directory(input_directory, output_directory)
