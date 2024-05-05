@@ -27,7 +27,7 @@ def create_app(model, threshold):
             model = app.config['model']
 
             # query the model
-            result = int(model.predict(ifs1, ifs2)[0])
+            result = int(model.predict_threshold(ifs1, ifs2, threshold)[0])
             print('LABEL = ', result)
             # print(type(result))
         
@@ -48,8 +48,10 @@ def create_app(model, threshold):
 
 if __name__ == '__main__':
     # load the model
-    model = load('malware_detection_model_updated.joblib')
-    threshold = 0.75
+    # model = load('malware_detection_model_updated.joblib') # this is the best model
+    model = load('final_model.joblib') # model for extras: tf-idf normalization, optimal threshold computation
+
+    threshold = 0.4366852343082428
 
     # Create app with the loaded model and threshold
     app = create_app(model, threshold)

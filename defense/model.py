@@ -20,7 +20,7 @@ class MalwareDetectionModel():
                 ) -> None:
         
         self.classifier = classifier
-        self.textual_extractor = CountVectorizer(vocabulary=vocabulary, binary=True) if textual_extractor==1 else TfidfVectorizer(vocabulary=vocabulary,ngram_range=(1,2))
+        self.textual_extractor = CountVectorizer(vocabulary=vocabulary, binary=True) if textual_extractor==1 else TfidfVectorizer(vocabulary=vocabulary,ngram_range=(1,2), norm='l2')
         self.numerical_extractor = numerical_extractor
         self.pca = pca
         self.selector = selector
